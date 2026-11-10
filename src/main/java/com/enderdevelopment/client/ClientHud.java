@@ -22,15 +22,22 @@ public final class ClientHud {
         }
         if (lines.isEmpty()) return;
 
-        int color = settings.accentColor();
-        int startX = 8;
-        int startY = 8;
+        int x = 8;
+        int y = 8;
+        int lineHeight = 12;
+        int width = 0;
         if (settings.layoutName().equals("Compact")) {
-            String line = String.join("  |  ", lines);
-            context.drawTextWithShadow(client.textRenderer, Text.literal(line), startX, startY, color);
+            width = client.textRenderer.getWidth(String.join("  |  ", lines));
+        } else {
+            for (String line : lines) width = Math.max(width, client.textRenderer.getWidth(line));
+        }
+        int height = settings.layoutName().equals("Compact") ? lineHeight : lines.size() * lineHeight;
+        context.fill(x - 4, y - 3, x + width + 4, y + height + 2, settings.backgroundColor());
+        if (settings.layoutName().equals("Compact")) {
+            context.drawTextWithShadow(client.textRenderer, Text.literal(String.join("  |  ", lines)), x, y, settings.accentColor());
         } else {
             for (int i = 0; i < lines.size(); i++) {
-                context.drawTextWithShadow(client.textRenderer, Text.literal(lines.get(i)), startX, startY + i * 12, color);
+                context.drawTextWithShadow(client.textRenderer, Text.literal(lines.get(i)), x, y + i * lineHeight, settings.accentColor());
             }
         }
     }
